@@ -60,23 +60,23 @@ Refactor Ansible Code with Imports and Roles
 Set Up a New Branch for Refactoring:
 
 Pull the latest changes from the main branch of your Ansible repository.
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/Pull%20the%20latest%20changes%20from%20the%20main%20branch%20of%20your%20Ansible%20repository.PNG)
 Create a new branch for refactoring:
 bash
 Copy code
 git checkout -b refactor
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/creating%20a%20new%20branch.PNG)
 Create site.yml for Managing Imports:
 
 In your playbooks directory, create a new file called site.yml.
 This file will serve as the main entry point for all your playbooks, so you can centralize your configurations.
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/create%20the%20site%20yml.PNG)
 Organize Playbooks with static-assignments:
 
 Create a folder named static-assignments at the root of your Ansible repository.
 bash
 Move the existing common.yml file into static-assignments.
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/create%20the%20site%20yml.PNG)
 Set Up Imports in site.yml:
 
 Open site.yml and add the following content to import common.yml:
@@ -111,7 +111,7 @@ Add a New Playbook to Delete Wireshark
 Create common-del.yml:
 
 In the static-assignments folder, create a new playbook named common-del.yml.
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/create%20common%20del%20yml.PNG)
 Add tasks to delete Wireshark from different server types
 ```
 ---
@@ -148,16 +148,16 @@ Copy code
 ---
 - hosts: all
 - import_playbook: ../static-assignments/common-del.yml
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/update%20site%20yml%20file.PNG)
 Run the Updated Playbook:
 
 Run the playbook again for your dev environment:
 bash
 Copy code
 ansible-playbook -i inventory/dev.ini playbooks/site.yml
-(screenshot)
+![(screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20your%20playbook.PNG))
 if you encounter the below error in this screenhot,  "Permission denied (publickey)" errors, this means that Ansible could not authenticate to your servers using the SSH key configured for these connections
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/permission%20error%20encountered.PNG)
 
 Set Up SSH Agent and Import pem Key
 follow these steps to use your .pem key instead:
@@ -176,7 +176,7 @@ Verify the Key Added
 List the keys added to the SSH agent to ensure your .pem file is included:
 
 ssh-add -l
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/setting%20up%20ssh%20agent.PNG)
 Run the playbook again for your dev environment:
 bash
 Copy code
@@ -188,4 +188,4 @@ Check each server to confirm Wireshark has been removed by running:
 bash
 Copy code
 wireshark --version
-(screenshot)
+https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20wireshark%20is%20successfully%20deleted.PNG
