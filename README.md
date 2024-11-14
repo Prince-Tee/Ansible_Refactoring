@@ -55,3 +55,137 @@ make changes on your github repository and your save atifact should run successf
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/save%20artifact%20successfull2.png)
 Verify that files are saved in /home/ubuntu/ansible-config-artifact.
 ![(screesnhot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20artifacts%20are%20save%20on%20your%20jenkins%20server.png)
+
+Refactor Ansible Code with Imports and Roles
+Set Up a New Branch for Refactoring:
+
+Pull the latest changes from the main branch of your Ansible repository.
+(screenshot)
+Create a new branch for refactoring:
+bash
+Copy code
+git checkout -b refactor
+(screenshot)
+Create site.yml for Managing Imports:
+
+In your playbooks directory, create a new file called site.yml.
+This file will serve as the main entry point for all your playbooks, so you can centralize your configurations.
+(screenshot)
+Organize Playbooks with static-assignments:
+
+Create a folder named static-assignments at the root of your Ansible repository.
+bash
+Move the existing common.yml file into static-assignments.
+(screenshot)
+Set Up Imports in site.yml:
+
+Open site.yml and add the following content to import common.yml:
+yaml
+Copy code
+---
+- hosts: all
+- import_playbook: ../static-assignments/common.yml
+
+Verify Folder Structure:
+
+Ensure your folder structure looks like this:
+arduino
+Copy code
+├── static-assignments
+│   └── common.yml
+├── inventory
+    └── dev
+    └── stage
+    └── uat
+    └── prod
+└── playbooks
+    └── site.yml
+Run the Playbook:
+
+Run the playbook for your dev environment to confirm it works:
+bash
+Copy code
+ansible-playbook -i inventory/dev.ini playbooks/site.yml
+  
+Add a New Playbook to Delete Wireshark
+Create common-del.yml:
+
+In the static-assignments folder, create a new playbook named common-del.yml.
+(screenshot)
+Add tasks to delete Wireshark from different server types
+```
+---
+- name: Remove Wireshark from web, nfs, and db servers
+  hosts: webservers, nfs, db
+  remote_user: ec2-user
+  become: yes
+  become_user: root
+  tasks:
+    - name: Delete Wireshark on RHEL/CentOS servers
+      yum:
+        name: wireshark
+        state: removed
+      when: ansible_facts['pkg_mgr'] == "yum"
+
+- name: Remove Wireshark from LB server
+  hosts: lb
+  remote_user: ubuntu
+  become: yes
+  become_user: root
+  tasks:
+    - name: Delete Wireshark on Ubuntu/Debian servers
+      apt:
+        name: wireshark
+        state: absent
+        purge: yes
+      when: ansible_facts['pkg_mgr'] == "apt"
+```
+Update site.yml to Include common-del.yml:
+
+Replace the import_playbook line in site.yml with:
+yaml
+Copy code
+---
+- hosts: all
+- import_playbook: ../static-assignments/common-del.yml
+(screenshot)
+Run the Updated Playbook:
+
+Run the playbook again for your dev environment:
+bash
+Copy code
+ansible-playbook -i inventory/dev.ini playbooks/site.yml
+(screenshot)
+if you encounter the below error in this screenhot,  "Permission denied (publickey)" errors, this means that Ansible could not authenticate to your servers using the SSH key configured for these connections
+(screenshot)
+
+Set Up SSH Agent and Import pem Key
+follow these steps to use your .pem key instead:
+
+Start the SSH Agent
+
+eval $(ssh-agent -s)
+Output example:
+
+Agent pid 599
+Add the .pem Key
+Replace <path-to-pem-file> with the location of your .pem file 
+
+ssh-add "/home/ubuntu/lamproject.pem"
+Verify the Key Added
+List the keys added to the SSH agent to ensure your .pem file is included:
+
+ssh-add -l
+(screenshot)
+Run the playbook again for your dev environment:
+bash
+Copy code
+ansible-playbook -i inventory/dev.ini playbooks/site.yml
+
+Verify Wireshark Removal:
+
+Check each server to confirm Wireshark has been removed by running:
+bash
+Copy code
+wireshark --version
+(screenshot)
