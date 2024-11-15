@@ -188,4 +188,4 @@ Check each server to confirm Wireshark has been removed by running:
 bash
 Copy code
 wireshark --version
-https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20wireshark%20is%20successfully%20deleted.PNG
+![screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20wireshark%20is%20successfully%20deleted.PNG)
