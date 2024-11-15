@@ -155,7 +155,8 @@ Run the playbook again for your dev environment:
 bash
 Copy code
 ansible-playbook -i inventory/dev.ini playbooks/site.yml
-![(screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20your%20playbook.PNG))
+![(screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20your%20playbook.PNG)
+![screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20the%20playbook.png)
 if you encounter the below error in this screenhot,  "Permission denied (publickey)" errors, this means that Ansible could not authenticate to your servers using the SSH key configured for these connections
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/permission%20error%20encountered.PNG)
 
@@ -182,6 +183,8 @@ bash
 Copy code
 ansible-playbook -i inventory/dev.ini playbooks/site.yml
 
+![screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20the%20playbook.png)
+
 Verify Wireshark Removal:
 
 Check each server to confirm Wireshark has been removed by running:
@@ -189,6 +192,8 @@ bash
 Copy code
 wireshark --version
 ![screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20wireshark%20is%20successfully%20deleted.PNG)
+![screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/check%20the%20servers%20if%20wireshark%20is%20removed.png)
+
 if you encounter any issue that the ec2-user server still have wireshark installed Update the when Condition if Necessary: If your RHEL servers are using dnf (common in newer CentOS/RHEL versions), the when condition should be updated:
 
 yaml
