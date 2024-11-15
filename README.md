@@ -189,3 +189,9 @@ bash
 Copy code
 wireshark --version
 ![screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20wireshark%20is%20successfully%20deleted.PNG)
+if you encounter any issue that the ec2-user server still have wireshark installed Update the when Condition if Necessary: If your RHEL servers are using dnf (common in newer CentOS/RHEL versions), the when condition should be updated:
+
+yaml
+Copy code
+when: ansible_facts['pkg_mgr'] in ["yum", "dnf"]
+This ensures the task runs for both yum and dnf.
