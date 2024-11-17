@@ -200,3 +200,309 @@ yaml
 Copy code
 when: ansible_facts['pkg_mgr'] in ["yum", "dnf"]
 This ensures the task runs for both yum and dnf.
+
+
+setting up the UAT web servers using an Ansible role called webserversetting up the UAT web servers using an Ansible role called webserver
+
+Launch Two EC2 Instances
+Log in to the AWS Management Console:
+
+Navigate to the EC2 Dashboard.
+Click Launch Instance.
+Select an AMI:
+
+Choose RHEL 8 as the image for your instances.
+Configure Instance Details:
+
+Set the instance count to 2.
+Assign appropriate names to the instances:
+Web1-UAT
+Web2-UAT
+
+(screenshot)
+Choose an existing security group or create a new one allowing:
+SSH (port 22)
+HTTP (port 80)
+(screenshot)
+Complete the Setup:
+
+Launch the instances and note their private IP addresses for inventory configuration later.
+
+Connect to Your Jenkins-Ansible Server
+Open a terminal on your local machine.
+Start the SSH agent:
+bash
+Copy code
+eval $(ssh-agent)
+ssh-add <path-to-your-private-key>
+Connect to your Jenkins-Ansible server:
+bash
+Copy code
+ssh -i <path-to-your-private-key> ubuntu@<jenkins-ansible-server-ip>
+(screenshot)
+
+Create a Role for Web Servers
+Option 1: Use ansible-galaxy (Recommended)
+Navigate to your project directory:
+bash
+Copy code
+cd ~/ansible-config-mgt
+mkdir -p roles
+cd roles
+Initialize the webserver role:
+bash
+Copy code
+ansible-galaxy init webserver
+Remove unnecessary directories and files:
+bash
+Copy code
+cd webserver
+rm -rf files vars templates tests
+(screenshot)
+
+Configure the Inventory File
+Open the UAT inventory file:
+bash
+Copy code
+nano inventory/uat.yml
+(screenshot)
+Add the private IPs of your UAT servers:
+yaml
+Copy code
+[uat-webservers]
+<Web1-UAT-Private-IP> ansible_ssh_user='ec2-user'
+<Web2-UAT-Private-IP> ansible_ssh_user='ec2-user'
+(screenshot)
+
+Update ansible.cfg
+Open the Ansible configuration file:
+bash
+Copy code
+nano /etc/ansible/ansible.cfg
+(screenshot)
+
+if you encounter an error that the file does not exist
+
+Create a Global Configuration File
+Navigate to the Default Location:
+bash
+Copy code
+sudo mkdir -p /etc/ansible
+(screenshot)
+Create and Edit ansible.cfg:
+bash
+Copy code
+sudo nano /etc/ansible/ansible.cfg
+
+update the roles_path with the code below:
+ini
+Copy code
+roles_path = /home/ubuntu/ansible-config-mgt/roles
+(screenshot)
+
+
+Write the webserver Role Logic
+Open the tasks/main.yml file:
+bash
+Copy code
+nano roles/webserver/tasks/main.yml
+(screenshot)
+Add the following tasks:
+yaml
+Copy code
+---
+- name: install apache
+  become: true
+  ansible.builtin.yum:
+    name: "httpd"
+    state: present
+
+- name: install git
+  become: true
+  ansible.builtin.yum:
+    name: "git"
+    state: present
+
+- name: clone a repo
+  become: true
+  ansible.builtin.git:
+    repo: https://github.com/<your-name>/tooling.git
+    dest: /var/www/html
+    force: yes
+
+- name: copy html content to one level up
+  become: true
+  command: cp -r /var/www/html/html/ /var/www/
+
+- name: Start service httpd, if not started
+  become: true
+  ansible.builtin.service:
+    name: httpd
+    state: started
+
+- name: recursively remove /var/www/html/html/ directory
+  become: true
+  ansible.builtin.file:
+    path: /var/www/html/html
+    state: absent
+    (screenshot)
+
+Referencing the 'Webserver' Role
+Let’s carefully go through each step to achieve the goal without mistakes.
+
+Step 1: Navigate to the Correct Directory
+Ensure you’re in the ansible-config-mgt directory where all your configuration files and roles are stored. Use this command to confirm your location:
+
+bash
+Copy code
+cd ~/ansible-config-mgt
+Run the ls command to verify that the directory contains folders like inventory, roles, and playbooks.
+
+Create uat-webservers.yml
+Navigate to the static-assignments folder:
+
+bash
+Copy code
+cd ~/ansible-config-mgt/static-assignments
+Create a new file named uat-webservers.yml:
+
+bash
+Copy code
+nano uat-webservers.yml
+Add the following content:
+
+yaml
+Copy code
+---
+- name: Configure UAT Webservers
+  hosts: uat-webservers
+  roles:
+    - webserver
+(screenshot)    
+
+Reference uat-webservers.yml in site.yml
+Navigate to the playbooks directory:
+
+bash
+Copy code
+cd ~/ansible-config-mgt/playbooks
+Open the site.yml file:
+
+bash
+Copy code
+nano site.yml
+
+(screenshot)
+
+Modify it to include a reference to uat-webservers.yml. Ensure your file looks like this:
+
+yaml
+Copy code
+---
+- hosts: all
+  import_playbook: ../static-assignments/common.yml
+
+- hosts: uat-webservers
+  import_playbook: ../static-assignments/uat-webservers.yml
+Save and exit the file.
+
+Commit Your Changes
+Now, let’s commit the changes to Git and push them to the repository.
+
+Navigate to the root of your project:
+
+bash
+Copy code
+cd ~/ansible-config-mgt
+
+Stage the changes:
+
+bash
+Copy code
+git add .
+
+Commit the changes with a message:
+
+bash
+Copy code
+git commit -m "Added uat-webservers role and updated site.yml"
+Push the changes to your repository:
+
+(screenshot)
+
+bash
+Copy code
+git push origin <your-branch-name> (git push origin refactor)
+(screenshot)
+
+Create a Pull Request (PR) on your GitHub repository hosting platform  to merge these changes into the main branch.
+(screenshot)
+(screenshot)
+(screenshot)
+(screenshot)
+
+Verify Jenkins Webhook
+Once the PR is merged, ensure that the webhook triggers the Jenkins pipeline jobs:
+
+Check Jenkins to see if two jobs ran:
+
+The first job: Builds the configuration.
+The second job: Deploys the files to /home/ubuntu/ansible-config-mgt on the Jenkins-Ansible server.
+
+(screenshot)
+(screenshot)
+
+Confirm the files are updated on the Jenkins-Ansible server by SSHing into it:
+then change the branch to main by running git checkout main and after that run git pull origin main to update
+(screenshot)
+
+then 
+cd /home/ubuntu/ansible-config-mgt
+ls
+Verify the updated uat-webservers.yml and site.yml files are present
+(screenshot)
+
+Run the playbook with the UAT inventory file:
+
+bash
+Copy code
+ansible-playbook -i /inventory/uat.ini playbooks/site.yml
+
+(Screenshot)
+
+Verify the Configuration
+SSH into one of the UAT servers:
+bash
+Copy code
+ssh -i <path-to-your-private-key> ec2-user@<Web1-UAT-Private-IP>
+Check if Apache is running:
+bash
+Copy code
+sudo systemctl status httpd
+
+(Screenshot)
+
+Verify the website files:
+bash
+Copy code
+ls -l /var/www/html
+
+(Screenshot)
+
+
+
+Verify Web Servers
+After the playbook runs successfully, note the public IP or DNS of your UAT web servers.
+
+Access the servers from your browser to verify:
+
+plaintext
+Copy code
+http://<Web1-UAT-Server-Public-IP-or-Public-DNS-Name>/index.php
+or
+
+plaintext
+Copy code
+http://<Web2-UAT-Server-Public-IP-or-Public-DNS-Name>/index.php
+(Screenshot)
+(screenshot)
