@@ -219,11 +219,11 @@ Assign appropriate names to the instances:
 Web1-UAT
 Web2-UAT
 
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/Launch%20Two%20EC2%20Instances.PNG)
 Choose an existing security group or create a new one allowing:
 SSH (port 22)
 HTTP (port 80)
-(screenshot)
+
 Complete the Setup:
 
 Launch the instances and note their private IP addresses for inventory configuration later.
@@ -239,7 +239,7 @@ Connect to your Jenkins-Ansible server:
 bash
 Copy code
 ssh -i <path-to-your-private-key> ubuntu@<jenkins-ansible-server-ip>
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/Start%20the%20SSH%20agent%20and%20Connect%20to%20your%20Jenkins-Ansible%20server.PNG)
 
 Create a Role for Web Servers
 Option 1: Use ansible-galaxy (Recommended)
@@ -258,28 +258,28 @@ bash
 Copy code
 cd webserver
 rm -rf files vars templates tests
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/Create%20a%20Role%20for%20Web%20Servers%20Use%20ansible-galaxy.PNG)
 
 Configure the Inventory File
 Open the UAT inventory file:
 bash
 Copy code
-nano inventory/uat.yml
-(screenshot)
+nano inventory/uat.ini
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/nano%20inventory%20uat%20ini.PNG)
 Add the private IPs of your UAT servers:
 yaml
 Copy code
 [uat-webservers]
 <Web1-UAT-Private-IP> ansible_ssh_user='ec2-user'
 <Web2-UAT-Private-IP> ansible_ssh_user='ec2-user'
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20of%20uat%20ini%20ith%20private%20ip%20addresses.PNG)
 
 Update ansible.cfg
 Open the Ansible configuration file:
 bash
 Copy code
 nano /etc/ansible/ansible.cfg
-(screenshot)
+
 
 if you encounter an error that the file does not exist
 
@@ -288,17 +288,17 @@ Navigate to the Default Location:
 bash
 Copy code
 sudo mkdir -p /etc/ansible
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/create%20the%20ect%20ansible%20directory.PNG)
 Create and Edit ansible.cfg:
 bash
 Copy code
 sudo nano /etc/ansible/ansible.cfg
-
+![(screenhot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/sudo%20nano%20etc%20ansible%20ansiblecfg.PNG)
 update the roles_path with the code below:
 ini
 Copy code
 roles_path = /home/ubuntu/ansible-config-mgt/roles
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20of%20sudo%20nano%20etc%20ansible%20ansiblecfg.PNG)
 
 
 Write the webserver Role Logic
@@ -306,7 +306,7 @@ Open the tasks/main.yml file:
 bash
 Copy code
 nano roles/webserver/tasks/main.yml
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/nano%20main%20yml.PNG)
 Add the following tasks:
 yaml
 Copy code
@@ -345,7 +345,7 @@ Copy code
   ansible.builtin.file:
     path: /var/www/html/html
     state: absent
-    (screenshot)
+    ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20nano%20main%20yml.PNG)
 
 Referencing the 'Webserver' Role
 Let’s carefully go through each step to achieve the goal without mistakes.
@@ -378,7 +378,7 @@ Copy code
   hosts: uat-webservers
   roles:
     - webserver
-(screenshot)    
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20of%20uat%20webservers%20yml.PNG)    
 
 Reference uat-webservers.yml in site.yml
 Navigate to the playbooks directory:
@@ -392,7 +392,7 @@ bash
 Copy code
 nano site.yml
 
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/nano%20site%20yml%20updating%20the%20file.PNG)
 
 Modify it to include a reference to uat-webservers.yml. Ensure your file looks like this:
 
@@ -428,18 +428,18 @@ Copy code
 git commit -m "Added uat-webservers role and updated site.yml"
 Push the changes to your repository:
 
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/git%20add%20git%20commit%20and.PNG)
 
 bash
 Copy code
 git push origin <your-branch-name> (git push origin refactor)
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/git%20push%20orgin%20refactor.PNG)
 
 Create a Pull Request (PR) on your GitHub repository hosting platform  to merge these changes into the main branch.
-(screenshot)
-(screenshot)
-(screenshot)
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/pull%20request.PNG)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/create%20pull%20request.PNG)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/review%20pull%20request.PNG)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/pull%20request%20successfullu%20merged.PNG)
 
 Verify Jenkins Webhook
 Once the PR is merged, ensure that the webhook triggers the Jenkins pipeline jobs:
@@ -449,18 +449,18 @@ Check Jenkins to see if two jobs ran:
 The first job: Builds the configuration.
 The second job: Deploys the files to /home/ubuntu/ansible-config-mgt on the Jenkins-Ansible server.
 
-(screenshot)
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/jenkins%20job%20build%20after%20we%20merged%20pull%20request.PNG)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/jenkins%20job%20build%20after%20we%20merged%20pull%20request2.PNG)
 
 Confirm the files are updated on the Jenkins-Ansible server by SSHing into it:
 then change the branch to main by running git checkout main and after that run git pull origin main to update
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/git%20checkout%20main%20and%20git%20pull%20origin%20main.PNG)
 
 then 
 cd /home/ubuntu/ansible-config-mgt
 ls
 Verify the updated uat-webservers.yml and site.yml files are present
-(screenshot)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20uat%20webserver%20and%20site%20yml%20are%20in%20your%20main%20branch.PNG)
 
 Run the playbook with the UAT inventory file:
 
@@ -468,7 +468,8 @@ bash
 Copy code
 ansible-playbook -i /inventory/uat.ini playbooks/site.yml
 
-(Screenshot)
+![(Screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20your%20playbook%20after%20uat%20ini%20against%20site%20yml.PNG)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20your%20playbook%20after%20uat%20ini%20against%20site%20yml2.PNG)
 
 Verify the Configuration
 SSH into one of the UAT servers:
@@ -480,14 +481,14 @@ bash
 Copy code
 sudo systemctl status httpd
 
-(Screenshot)
+![(Screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/Apache%20is%20running%20on%20all%20of%20our%20servers.PNG)
 
 Verify the website files:
 bash
 Copy code
 ls -l /var/www/html
 
-(Screenshot)
+![(Screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/ls%20html.PNG)
 
 
 
@@ -504,5 +505,5 @@ or
 plaintext
 Copy code
 http://<Web2-UAT-Server-Public-IP-or-Public-DNS-Name>/index.php
-(Screenshot)
-(screenshot)
+![(Screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/webserver%201%20after%20doing%20everything.PNG)
+![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/web%20sever%202%20after%20we%20are%20done%20installing%20everything.PNG)
