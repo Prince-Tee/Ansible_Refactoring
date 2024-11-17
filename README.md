@@ -1,4 +1,4 @@
-### Ansible Refactoring & Static Assignments (Imports and Roles)
+# Ansible Refactoring & Static Assignments (Imports and Roles)
 This guide walks through refactoring Ansible configurations using imports and roles, as well as setting up Jenkins to manage and save artifacts. Follow the steps below for a seamless setup and execution.
 
 Connect to your Jenkins-Ansible server terminal by ssh on your terminal
@@ -53,7 +53,7 @@ In the project settings, set Discard Old Builds to keep only the last 2-5 builds
 ![(Screenshots)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/set%20Discard%20Old%20Builds%20to%20keep%20only%20the%20last%202%205%20builds.png)
 
 
-## Configure Artifact Copying:
+### Configure Artifact Copying:
 
 In the Build step section of save_artifacts, add a Copy artifacts from another project step.
 Set Source Project to your Ansible job(named "ansible").
@@ -91,7 +91,7 @@ Verify that files are saved in /home/ubuntu/ansible-config-artifact.
 
 ![(screesnhot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20artifacts%20are%20save%20on%20your%20jenkins%20server.png)
 
-## Refactor Ansible Code with Imports and Roles
+### Refactor Ansible Code with Imports and Roles
 Set Up a New Branch for Refactoring:
 
 Pull the latest changes from the main branch of your Ansible repository.
@@ -117,7 +117,7 @@ Move the existing common.yml file into static-assignments.
 
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/create%20the%20site%20yml.PNG)
 
-# Set Up Imports in site.yml:
+### Set Up Imports in site.yml:
 Open site.yml and add the following content to import common.yml:
 ```yaml
 ---
@@ -125,7 +125,7 @@ Open site.yml and add the following content to import common.yml:
 - import_playbook: ../static-assignments/common.yml
 ```
 
-# Verify Folder Structure:
+### Verify Folder Structure:
 
 Ensure your folder structure looks like this:
 ```arduino
@@ -146,7 +146,7 @@ Run the playbook for your dev environment to confirm it works:
 ```bash
 ansible-playbook -i inventory/dev.ini playbooks/site.yml
   ```
-# Add a New Playbook to Delete Wireshark
+### Add a New Playbook to Delete Wireshark
 Create common-del.yml:
 In the static-assignments folder, create a new playbook named common-del.yml.
 
@@ -190,7 +190,7 @@ Replace the import_playbook line in site.yml with:
 ```
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/update%20site%20yml%20file.PNG)
 
-# Run the Updated Playbook:
+### Run the Updated Playbook:
 Run the playbook again for your dev environment:
 ```bash
 ansible-playbook -i inventory/dev.ini playbooks/site.yml
@@ -204,7 +204,7 @@ if you encounter the below error in this screenhot,  "Permission denied (publick
 
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/permission%20error%20encountered.PNG)
 
-# Set Up SSH Agent and Import pem Key
+### Set Up SSH Agent and Import pem Key
 follow these steps to use your .pem key instead:
 
 Start the SSH Agent
@@ -235,7 +235,7 @@ ansible-playbook -i inventory/dev.ini playbooks/site.yml
 
 ![screenshot](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20the%20playbook.png)
 
-# Verify Wireshark Removal:
+### Verify Wireshark Removal:
 
 Check each server to confirm Wireshark has been removed by running:
 ```bash
@@ -254,7 +254,7 @@ when: ansible_facts['pkg_mgr'] in ["yum", "dnf"]
 This ensures the task runs for both yum and dnf.
 
 
-# setting up the UAT web servers using an Ansible role called webserver
+### setting up the UAT web servers using an Ansible role called webserver
 
 Launch Two EC2 Instances
 Log in to the AWS Management Console:
@@ -281,7 +281,7 @@ Complete the Setup:
 
 Launch the instances and note their private IP addresses for inventory configuration later.
 
-# Connect to Your Jenkins-Ansible Server
+### Connect to Your Jenkins-Ansible Server
 Open a terminal on your local machine.
 Start the SSH agent:
 ```bash
@@ -295,7 +295,7 @@ ssh -i <path-to-your-private-key> ubuntu@<jenkins-ansible-server-ip>
 
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/Start%20the%20SSH%20agent%20and%20Connect%20to%20your%20Jenkins-Ansible%20server.PNG)
 
-# Create a Role for Web Servers
+### Create a Role for Web Servers
 Option 1: Use ansible-galaxy (Recommended)
 Navigate to your project directory:
 ```bash
@@ -314,7 +314,7 @@ rm -rf files vars templates tests
 ```
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/Create%20a%20Role%20for%20Web%20Servers%20Use%20ansible-galaxy.PNG)
 
-# Configure the Inventory File
+### Configure the Inventory File
 Open the UAT inventory file:
 ```bash
 nano inventory/uat.ini
@@ -329,7 +329,7 @@ Add the private IPs of your UAT servers:
 ```
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20of%20uat%20ini%20ith%20private%20ip%20addresses.PNG)
 
-# Update ansible.cfg
+### Update ansible.cfg
 Open the Ansible configuration file:
 ```bash
 nano /etc/ansible/ansible.cfg
@@ -360,7 +360,7 @@ roles_path = /home/ubuntu/ansible-config-mgt/roles
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20of%20sudo%20nano%20etc%20ansible%20ansiblecfg.PNG)
 
 
-# Write the webserver Role Logic
+### Write the webserver Role Logic
 Open the tasks/main.yml file:
 ```bash
 Copy code
@@ -411,7 +411,7 @@ Copy code
 
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20nano%20main%20yml.PNG)
 
-# Referencing the 'Webserver' Role
+### Referencing the 'Webserver' Role
 
  Navigate to the Correct Directory
 Ensure you’re in the ansible-config-mgt directory where all your configuration files and roles are stored. Use this command to confirm your location:
@@ -422,7 +422,7 @@ cd ~/ansible-config-mgt
 ```
 Run the ls command to verify that the directory contains folders like inventory, roles, and playbooks.
 
-# Create uat-webservers.yml
+### Create uat-webservers.yml
 Navigate to the static-assignments folder:
 
 ```bash
@@ -442,7 +442,7 @@ Add the following content:
 ```
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/content%20of%20uat%20webservers%20yml.PNG)    
 
-# Reference uat-webservers.yml in site.yml
+### Reference uat-webservers.yml in site.yml
 Navigate to the playbooks directory:
 ```bash
 Copy code
@@ -466,7 +466,7 @@ Modify it to include a reference to uat-webservers.yml. Ensure your file looks l
   ```
 Save and exit the file.
 
-# Commit Your Changes
+### Commit Your Changes
 Now, let’s commit the changes to Git and push them to the repository.
 
 Navigate to the root of your project:
@@ -499,7 +499,7 @@ Create a Pull Request (PR) on your GitHub repository hosting platform  to merge 
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/review%20pull%20request.PNG)
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/pull%20request%20successfullu%20merged.PNG)
 
-# Verify Jenkins Webhook
+### Verify Jenkins Webhook
 Once the PR is merged, ensure that the webhook triggers the Jenkins pipeline jobs:
 
 Check Jenkins to see if two jobs ran:
@@ -523,14 +523,14 @@ Verify the updated uat-webservers.yml and site.yml files are present
 
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/verify%20that%20uat%20webserver%20and%20site%20yml%20are%20in%20your%20main%20branch.PNG)
 
-# Run the playbook with the UAT inventory file:
+### Run the playbook with the UAT inventory file:
 ```bash
 ansible-playbook -i /inventory/uat.ini playbooks/site.yml
 ```
 ![(Screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20your%20playbook%20after%20uat%20ini%20against%20site%20yml.PNG)
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/run%20your%20playbook%20after%20uat%20ini%20against%20site%20yml2.PNG)
 
-# Verify the Configuration
+### Verify the Configuration
 SSH into one of the UAT servers:
 ```bash
 ssh -i <path-to-your-private-key> ec2-user@<Web1-UAT-Private-IP>
@@ -548,7 +548,7 @@ ls -l /var/www/html
 
 ![(Screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/ls%20html.PNG)
 
-# Verify Web Servers
+### Verify Web Servers
 After the playbook runs successfully, note the public IP or DNS of your UAT web servers.
 
 Access the servers from your browser to verify:
@@ -566,5 +566,5 @@ http://<Web2-UAT-Server-Public-IP-or-Public-DNS-Name>/index.php
 ![(Screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/webserver%201%20after%20doing%20everything.PNG)
 ![(screenshot)](https://github.com/Prince-Tee/Ansible_Refactoring/blob/main/screenshot%20from%20my%20env/web%20sever%202%20after%20we%20are%20done%20installing%20everything.PNG)
 
-# Conclusion
+### Conclusion
 We refactored our ansible configuration to deploy our web application using ansible roles. We also used Ansible imports and roles to modularise our ansible configuration.
